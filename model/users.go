@@ -10,9 +10,9 @@ import (
 
 type Users struct {
 	Id    string
-	Nama  string `json:"name" form:"name"`
-	HP    string `json:"hp" form:"hp"`
-	Sandi string `json:"password" form:"password"`
+	Nama  string `gorm:"type:varchar(255)"`
+	HP    string `gorm:"type:varchar(13);uniqueIndex"`
+	Sandi string
 }
 
 func (u *Users) GenerateID() {
@@ -39,4 +39,14 @@ func (um *UsersModel) Register(newUser Users) *Users {
 	}
 
 	return &newUser
+}
+
+func (um *UsersModel) GetAll() []Users {
+	var listUser = []Users{}
+	if err := um.db.Find(&listUser).Error; err != nil {
+		logrus.Error("Model : Insert data error, ", err.Error())
+		return nil
+	}
+
+	return listUser
 }

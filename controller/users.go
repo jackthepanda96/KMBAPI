@@ -1,8 +1,8 @@
 package controller
 
 import (
-	"fmt"
 	"net/http"
+	"restEcho1/helper"
 	"restEcho1/model"
 
 	"github.com/labstack/echo/v4"
@@ -20,22 +20,15 @@ func (uc *UserController) Register() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var input = model.Users{}
 		if err := c.Bind(&input); err != nil {
-			return c.JSON(http.StatusBadRequest, map[string]any{
-				"message": "invalid user input",
-			})
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("invalid user input", nil))
 		}
-		fmt.Println(input)
+
 		var res = uc.model.Register(input)
 
 		if res == nil {
-			return c.JSON(http.StatusInternalServerError, map[string]any{
-				"message": "cannot process data, something happend",
-			})
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("cannot process data, something happend", nil))
 		}
 
-		return c.JSON(http.StatusCreated, map[string]any{
-			"message": "success",
-			"data":    res,
-		})
+		return c.JSON(http.StatusCreated, helper.FormatResponse("success", res))
 	}
 }
