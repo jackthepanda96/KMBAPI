@@ -3,6 +3,9 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"restEcho1/configs"
+	"restEcho1/controller"
+	"restEcho1/model"
 	"strconv"
 
 	"github.com/google/uuid"
@@ -136,34 +139,23 @@ func Delete() echo.HandlerFunc {
 
 func main() {
 	e := echo.New()
+	var config = configs.InitConfig()
+	fmt.Println(config)
 
-	// e.GET("/users", func(c echo.Context) error {
-	// 	if len(ListUser) == 0 {
-	// 		return c.JSON(http.StatusNotFound,
-	// 			SetResponse("data tidak ditemukan", nil))
+	db := model.InitModel(*config)
+	model.Migrate(db)
 
-	// 	}
-	// 	return c.JSON(200, SetResponse("sukses", ListUser))
+	userModel := model.UsersModel{}
+	userModel.Init(db)
 
-	// })
-	// e.POST("/users", Register)
-	// e.PUT("/users/:idx", Update)
+	userControll := controller.UserController{}
+	userControll.InitUserController(userModel)
 
 	var users = e.Group("/users")
-	users.GET("", func(c echo.Context) error {
+	users.POST("", userControll.Register())
+	// users.PUT("/:idx", Update)
+	// users.GET("/:idx", GetDataByIndex)
+	// users.DELETE("/:idx", Delete())
 
-		if len(ListUser) == 0 {
-			return c.JSON(http.StatusNotFound,
-				SetResponse("data tidak ditemukan", nil))
-
-		}
-		return c.JSON(200, SetResponse("sukses", ListUser))
-
-	})
-	users.POST("", Register)
-	users.PUT("/:idx", Update)
-	users.GET("/:idx", GetDataByIndex)
-	users.DELETE("/:idx", Delete())
-
-	e.Logger.Fatal(e.Start(":8000").Error())
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }
