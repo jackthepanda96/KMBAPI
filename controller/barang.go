@@ -55,3 +55,27 @@ func (bc *BarangController) Delete() echo.HandlerFunc {
 		return c.JSON(http.StatusNoContent, nil)
 	}
 }
+
+func (bc *BarangController) Update() echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var paramId = c.Param("id")
+		cnv, err := strconv.Atoi(paramId)
+		if err != nil {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("invalid id", nil))
+		}
+
+		var input = model.Barang{}
+		if err := c.Bind(&input); err != nil {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("invalid user input", nil))
+		}
+		input.ID = uint(cnv)
+
+		var res = bc.model.UpdateData2(input)
+
+		if !res {
+			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("cannot process data, something happend", nil))
+		}
+
+		return c.JSON(http.StatusCreated, helper.FormatResponse("success", res))
+	}
+}

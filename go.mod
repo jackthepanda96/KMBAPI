@@ -8,7 +8,11 @@ require (
 	gorm.io/gorm v1.25.4
 )
 
-require github.com/go-sql-driver/mysql v1.7.0 // indirect
+require (
+	github.com/go-sql-driver/mysql v1.7.0 // indirect
+	github.com/golang-jwt/jwt v3.2.2+incompatible // indirect
+	golang.org/x/time v0.3.0 // indirect
+)
 
 require (
 	github.com/google/uuid v1.3.1 // indirect

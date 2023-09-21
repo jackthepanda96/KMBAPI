@@ -7,7 +7,8 @@ import (
 
 type Barang struct {
 	gorm.Model
-	Nama string `json:"nama" gorm:"type:varchar(255)"`
+	Nama    string `json:"nama" gorm:"type:varchar(255)"`
+	Pemilik string `gorm:"type:varchar(20)"`
 }
 
 type BarangModel struct {
@@ -44,4 +45,34 @@ func (bm *BarangModel) Delete(id int) {
 	if err := bm.db.Delete(&deletdData).Error; err != nil {
 		logrus.Error("Model : Delete error, ", err.Error())
 	}
+}
+
+func (bm *BarangModel) UpdateData(updatedData Barang) bool {
+	var qry = bm.db.Save(&updatedData)
+	if err := qry.Error; err != nil {
+		logrus.Error("Model : Update error, ", err.Error())
+		return false
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		logrus.Error("Model : Update error, ", "no data affected")
+		return false
+	}
+
+	return true
+}
+
+func (bm *BarangModel) UpdateData2(updatedData Barang) bool {
+	var qry = bm.db.Table("barangs").Where("id = ?", updatedData.ID).Update("nama", updatedData.Nama)
+	if err := qry.Error; err != nil {
+		logrus.Error("Model : Update error, ", err.Error())
+		return false
+	}
+
+	if dataCount := qry.RowsAffected; dataCount < 1 {
+		logrus.Error("Model : Update error, ", "no data affected")
+		return false
+	}
+
+	return true
 }

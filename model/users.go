@@ -9,10 +9,11 @@ import (
 )
 
 type Users struct {
-	Id    string
-	Nama  string `gorm:"type:varchar(255)"`
-	HP    string `gorm:"type:varchar(13);uniqueIndex"`
-	Sandi string
+	Id      string `gorm:"primaryKey;type:varchar(20)"`
+	Nama    string `gorm:"type:varchar(255)"`
+	HP      string `gorm:"type:varchar(13);uniqueIndex"`
+	Sandi   string
+	Barangs []Barang `gorm:"foreignKey:Pemilik;references:Id"`
 }
 
 func (u *Users) GenerateID() {
