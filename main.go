@@ -24,7 +24,7 @@ func main() {
 	barangModel.Init(db)
 
 	userControll := controller.UserController{}
-	userControll.InitUserController(userModel)
+	userControll.InitUserController(userModel, *config)
 
 	barangControll := controller.BarangController{}
 	barangControll.InitUserController(barangModel)
@@ -37,7 +37,7 @@ func main() {
 			Format: "method=${method}, uri=${uri}, status=${status}, time=${time_rfc3339}\n",
 		}))
 
-	routes.RouteUser(e, userControll)
+	routes.RouteUser(e, userControll, *config)
 	routes.RouteBarang(e, barangControll)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())

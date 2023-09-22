@@ -15,6 +15,7 @@ type ProgramConfig struct {
 	DBUser     string
 	DBPass     string
 	DBName     string
+	Secret     string
 }
 
 func InitConfig() *ProgramConfig {
@@ -71,6 +72,10 @@ func loadConfig() *ProgramConfig {
 
 	if val, found := os.LookupEnv("DBNAME"); found {
 		res.DBName = val
+	}
+
+	if val, found := os.LookupEnv("SECRET"); found {
+		res.Secret = val
 	}
 
 	return res

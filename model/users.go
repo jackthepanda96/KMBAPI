@@ -9,11 +9,16 @@ import (
 )
 
 type Users struct {
-	Id      string `gorm:"primaryKey;type:varchar(20)"`
+	Id      string `gorm:"primaryKey;type:varchar(255)"`
 	Nama    string `gorm:"type:varchar(255)"`
 	HP      string `gorm:"type:varchar(13);uniqueIndex"`
 	Sandi   string
 	Barangs []Barang `gorm:"foreignKey:Pemilik;references:Id"`
+}
+
+type LoginModel struct {
+	HP    string `json:"hp"`
+	Sandi string `json:"password"`
 }
 
 func (u *Users) GenerateID() {
@@ -50,4 +55,18 @@ func (um *UsersModel) GetAll() []Users {
 	}
 
 	return listUser
+}
+
+func (um *UsersModel) Login(hp string, password string) *Users {
+	var data = Users{}
+	if err := um.db.Where("hp = ?", hp).First(&data).Error; err != nil {
+		logrus.Error("Model : Login data error,", err.Error())
+		return nil
+	}
+	if data.Id == "" {
+		logrus.Error("Model : not found")
+		return &data
+	}
+
+	return &data
 }
