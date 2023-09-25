@@ -9,13 +9,14 @@ import (
 )
 
 type ProgramConfig struct {
-	ServerPort int
-	DBPort     int
-	DBHost     string
-	DBUser     string
-	DBPass     string
-	DBName     string
-	Secret     string
+	ServerPort    int
+	DBPort        int
+	DBHost        string
+	DBUser        string
+	DBPass        string
+	DBName        string
+	Secret        string
+	RefreshSecret string
 }
 
 func InitConfig() *ProgramConfig {
@@ -76,6 +77,10 @@ func loadConfig() *ProgramConfig {
 
 	if val, found := os.LookupEnv("SECRET"); found {
 		res.Secret = val
+	}
+
+	if val, found := os.LookupEnv("REFSECRET"); found {
+		res.RefreshSecret = val
 	}
 
 	return res

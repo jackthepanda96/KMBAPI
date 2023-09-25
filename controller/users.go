@@ -40,7 +40,20 @@ func (uc *UserController) Register() echo.HandlerFunc {
 
 func (uc *UserController) RefreshToken() echo.HandlerFunc {
 	return func(c echo.Context) error {
-		return c.JSON(http.StatusOK, helper.FormatResponse("success", nil))
+		type RefreshInput struct {
+			Token string `json:"access_token" form:"access_token"`
+		}
+		var input = RefreshInput{}
+		if err := c.Bind(&input); err != nil {
+			return c.JSON(http.StatusBadRequest, helper.FormatResponse("invalid user input", nil))
+		}
+
+		var currentToken = c.Get("user").(*jwt.Token)
+
+		var response = helper.RefereshJWT(&jwt.Token{
+			Raw: input.Token,
+		}, currentToken)
+		return c.JSON(http.StatusOK, helper.FormatResponse("success", response))
 	}
 }
 
@@ -48,7 +61,8 @@ func (uc *UserController) MyProfile() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var token = c.Get("user")
 		var jwtClaims = helper.ExtractToken(token.(*jwt.Token))
-		logrus.Info(jwtClaims)
+		var mapClaims = jwtClaims.(jwt.Claims).(jwt.MapClaims)
+		logrus.Info(mapClaims["id"])
 
 		return c.JSON(http.StatusOK, "ok")
 	}
@@ -71,7 +85,7 @@ func (uc *UserController) Login() echo.HandlerFunc {
 			return c.JSON(http.StatusNotFound, helper.FormatResponse("data not found", nil))
 		}
 
-		var jwtToken = helper.GenerateJWT(uc.cfg.Secret, uc.cfg.Secret, res.Id)
+		var jwtToken = helper.GenerateJWT(uc.cfg.Secret, uc.cfg.RefreshSecret, res.Id)
 
 		if jwtToken == nil {
 			return c.JSON(http.StatusInternalServerError, helper.FormatResponse("cannot process data", nil))

@@ -38,7 +38,7 @@ func main() {
 		}))
 
 	routes.RouteUser(e, userControll, *config)
-	routes.RouteBarang(e, barangControll)
+	routes.RouteBarang(e, barangControll, *config)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }

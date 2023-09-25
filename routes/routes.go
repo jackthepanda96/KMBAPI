@@ -6,18 +6,21 @@ import (
 
 	echojwt "github.com/labstack/echo-jwt/v4"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 )
 
 func RouteUser(e *echo.Echo, uc controller.UserController, cfg configs.ProgramConfig) {
 	e.POST("/users", uc.Register())
 	e.POST("/login", uc.Login())
 	e.GET("/users", uc.MyProfile(), echojwt.JWT([]byte(cfg.Secret)))
+	e.POST("/refresh", uc.RefreshToken(), echojwt.JWT([]byte(cfg.RefreshSecret)))
 }
 
-func RouteBarang(e *echo.Echo, bc controller.BarangController) {
-	e.POST("/barangs", bc.Insert())
-	e.GET("/barangs", bc.GetBarangs(), middleware.JWT("yourKey"))
-	e.DELETE("/barangs", bc.Delete())
-	e.PUT("/barangs/:id", bc.Update())
+func RouteBarang(e *echo.Echo, bc controller.BarangController, cfg configs.ProgramConfig) {
+	var barang = e.Group("/barangs")
+	barang.Use(echojwt.JWT([]byte(cfg.Secret)))
+
+	barang.POST("", bc.Insert())
+	barang.GET("", bc.GetBarangs())
+	barang.DELETE("", bc.Delete())
+	barang.PUT("/:id", bc.Update())
 }

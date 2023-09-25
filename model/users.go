@@ -9,10 +9,10 @@ import (
 )
 
 type Users struct {
-	Id      string `gorm:"primaryKey;type:varchar(255)"`
-	Nama    string `gorm:"type:varchar(255)"`
-	HP      string `gorm:"type:varchar(13);uniqueIndex"`
-	Sandi   string
+	Id      string   `gorm:"primaryKey;type:varchar(255)"`
+	Nama    string   `gorm:"type:varchar(255)" json:"nama"`
+	HP      string   `gorm:"type:varchar(13);uniqueIndex" json:"hp"`
+	Sandi   string   `json:"password"`
 	Barangs []Barang `gorm:"foreignKey:Pemilik;references:Id"`
 }
 
