@@ -50,9 +50,7 @@ func (uc *UserController) RefreshToken() echo.HandlerFunc {
 
 		var currentToken = c.Get("user").(*jwt.Token)
 
-		var response = helper.RefereshJWT(&jwt.Token{
-			Raw: input.Token,
-		}, currentToken)
+		var response = helper.RefereshJWT(input.Token, currentToken, uc.cfg.Secret)
 		return c.JSON(http.StatusOK, helper.FormatResponse("success", response))
 	}
 }
