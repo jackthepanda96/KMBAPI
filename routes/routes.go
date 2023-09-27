@@ -12,12 +12,13 @@ func RouteUser(e *echo.Echo, uc controller.UserController, cfg configs.ProgramCo
 	e.POST("/users", uc.Register())
 	e.POST("/login", uc.Login())
 	e.GET("/users", uc.MyProfile(), echojwt.JWT([]byte(cfg.Secret)))
+	// e.GET("/users/:id",)
 	e.POST("/refresh", uc.RefreshToken(), echojwt.JWT([]byte(cfg.RefreshSecret)))
 }
 
 func RouteBarang(e *echo.Echo, bc controller.BarangController, cfg configs.ProgramConfig) {
 	var barang = e.Group("/barangs")
-	barang.Use(echojwt.JWT([]byte(cfg.Secret)))
+	// barang.Use(echojwt.JWT([]byte(cfg.Secret)))
 
 	barang.POST("", bc.Insert())
 	barang.GET("", bc.GetBarangs())

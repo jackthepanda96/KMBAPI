@@ -58,11 +58,11 @@ func (uc *UserController) RefreshToken() echo.HandlerFunc {
 func (uc *UserController) MyProfile() echo.HandlerFunc {
 	return func(c echo.Context) error {
 		var token = c.Get("user")
-		var jwtClaims = helper.ExtractToken(token.(*jwt.Token))
-		var mapClaims = jwtClaims.(jwt.Claims).(jwt.MapClaims)
-		logrus.Info(mapClaims["id"])
+		var id = helper.ExtractToken(token.(*jwt.Token))
 
-		return c.JSON(http.StatusOK, "ok")
+		logrus.Info(id)
+		// buat model untuk select data dari DB where id = idHasilExtract
+		return c.JSON(http.StatusOK, id)
 	}
 }
 
