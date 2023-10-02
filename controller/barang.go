@@ -9,12 +9,25 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type BarangController struct {
-	model model.BarangModel
+type BarangControllInterface interface {
+	Insert() echo.HandlerFunc
+	GetBarangs() echo.HandlerFunc
+	Delete() echo.HandlerFunc
+	Update() echo.HandlerFunc
 }
 
-func (bc *BarangController) InitUserController(bm model.BarangModel) {
-	bc.model = bm
+type BarangController struct {
+	model model.BarangInterface
+}
+
+// func (bc *BarangController) InitUserController(bm model.BarangModel) {
+// 	bc.model = bm
+// }
+
+func NewBarangControllInterface(m model.BarangInterface) BarangControllInterface {
+	return &BarangController{
+		model: m,
+	}
 }
 
 func (bc *BarangController) Insert() echo.HandlerFunc {

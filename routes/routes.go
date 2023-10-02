@@ -16,7 +16,7 @@ func RouteUser(e *echo.Echo, uc controller.UserController, cfg configs.ProgramCo
 	e.POST("/refresh", uc.RefreshToken(), echojwt.JWT([]byte(cfg.RefreshSecret)))
 }
 
-func RouteBarang(e *echo.Echo, bc controller.BarangController, cfg configs.ProgramConfig) {
+func RouteBarang(e *echo.Echo, bc controller.BarangControllInterface, cfg configs.ProgramConfig) {
 	var barang = e.Group("/barangs")
 	// barang.Use(echojwt.JWT([]byte(cfg.Secret)))
 

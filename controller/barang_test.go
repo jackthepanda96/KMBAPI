@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"restEcho1/configs"
 	"restEcho1/model"
 	"testing"
 
@@ -12,35 +11,53 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+type MockModel struct{}
+
+func (mm *MockModel) Insert(newItem model.Barang) *model.Barang {
+	return nil
+}
+func (mm *MockModel) GetAllBarang() []model.Barang {
+	return nil
+}
+func (mm *MockModel) Delete(id int) {
+
+}
+func (mm *MockModel) UpdateData(updatedData model.Barang) bool {
+	return false
+}
+func (mm *MockModel) UpdateData2(updatedData model.Barang) bool {
+	return false
+}
+
 func TestGetBarangs(t *testing.T) {
 
 	// Setup Controller
 
-	var cfg = configs.InitConfig()
-	var gorm = model.InitModel(*cfg)
+	var mdl = MockModel{}
 
-	var mdl = model.BarangModel{}
-	mdl.Init(gorm)
-	var ctl = BarangController{}
-	ctl.InitUserController(mdl)
+	var ctl = NewBarangControllInterface(&mdl)
 
 	var e = echo.New()
+	e.GET("/barangs", ctl.GetBarangs())
 
-	var req = httptest.NewRequest(http.MethodGet, "/", nil)
+	var req = httptest.NewRequest(http.MethodGet, "/barangs", nil)
 	var res = httptest.NewRecorder()
+	e.ServeHTTP(res, req)
 
-	var c = e.NewContext(req, res)
-	c.SetPath("/barangs")
+	type ResponseData struct {
+		Data    map[string]any `json:"data"`
+		Message string         `json:"message"`
+	}
 
-	var tmp = map[string]any{}
+	var tmp = ResponseData{}
 
-	var resData = res.Body.Bytes()
-	err := json.Unmarshal(resData, &tmp)
-
-	// var resData = json.NewDecoder(res.Body)
-	// resData.Decode(&tmp)
+	var resData = json.NewDecoder(res.Result().Body)
+	err := resData.Decode(&tmp)
 
 	assert.Equal(t, 200, res.Code)
-	assert.Error(t, err)
+	assert.Nil(t, err)
+	assert.NotNil(t, tmp)
+	assert.Equal(t, "success", tmp.Message)
+	assert.Nil(t, tmp.Data)
 
 }

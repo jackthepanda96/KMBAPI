@@ -20,14 +20,12 @@ func main() {
 
 	userModel := model.UsersModel{}
 	userModel.Init(db)
-	barangModel := model.BarangModel{}
-	barangModel.Init(db)
+	barangModel := model.NewBarangModel(db)
 
 	userControll := controller.UserController{}
 	userControll.InitUserController(userModel, *config)
 
-	barangControll := controller.BarangController{}
-	barangControll.InitUserController(barangModel)
+	barangControll := controller.NewBarangControllInterface(barangModel)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 

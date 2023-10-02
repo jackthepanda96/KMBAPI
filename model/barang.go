@@ -5,6 +5,14 @@ import (
 	"gorm.io/gorm"
 )
 
+type BarangInterface interface {
+	Insert(newItem Barang) *Barang
+	GetAllBarang() []Barang
+	Delete(id int)
+	UpdateData(updatedData Barang) bool
+	UpdateData2(updatedData Barang) bool
+}
+
 type Barang struct {
 	gorm.Model
 	Nama    string `json:"nama" gorm:"type:varchar(255)"`
@@ -17,6 +25,12 @@ type BarangModel struct {
 
 func (bm *BarangModel) Init(db *gorm.DB) {
 	bm.db = db
+}
+
+func NewBarangModel(db *gorm.DB) BarangInterface {
+	return &BarangModel{
+		db: db,
+	}
 }
 
 func (bm *BarangModel) Insert(newItem Barang) *Barang {
