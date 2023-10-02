@@ -153,3 +153,48 @@ func TestInsert(t *testing.T) {
 		assert.Equal(t, "buku", tmp.Data["nama"])
 	})
 }
+
+func TestDelete(t *testing.T) {
+	var mdl = MockModel{}
+	var ctl = NewBarangControllInterface(&mdl)
+
+	var e = echo.New()
+	e.DELETE("/barangs/:id", ctl.Delete())
+
+	t.Run("Invalid ID", func(t *testing.T) {
+		var req = httptest.NewRequest(http.MethodDelete, "/barangs/satu", nil)
+		var res = httptest.NewRecorder()
+
+		e.ServeHTTP(res, req)
+		type ResponseData struct {
+			Data    map[string]any `json:"data"`
+			Message string         `json:"message"`
+		}
+
+		var tmp = ResponseData{}
+		var resData = json.NewDecoder(res.Result().Body)
+		err := resData.Decode(&tmp)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusBadRequest, res.Code)
+	})
+
+	t.Run("Success Delete", func(t *testing.T) {
+		var req = httptest.NewRequest(http.MethodDelete, "/barangs/1", nil)
+		var res = httptest.NewRecorder()
+
+		e.ServeHTTP(res, req)
+		type ResponseData struct {
+			Data    map[string]any `json:"data"`
+			Message string         `json:"message"`
+		}
+
+		var tmp = ResponseData{}
+		var resData = json.NewDecoder(res.Result().Body)
+		err := resData.Decode(&tmp)
+
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusNoContent, res.Code)
+	})
+
+}
