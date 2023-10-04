@@ -3,9 +3,12 @@ package main
 import (
 	"fmt"
 	"restEcho1/configs"
-	"restEcho1/controller"
-	"restEcho1/model"
+	"restEcho1/features/users/data"
+	"restEcho1/features/users/handler"
+	"restEcho1/features/users/service"
+	"restEcho1/helper"
 	"restEcho1/routes"
+	"restEcho1/utils/database"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -15,17 +18,16 @@ func main() {
 	e := echo.New()
 	var config = configs.InitConfig()
 
-	db := model.InitModel(*config)
-	model.Migrate(db)
+	db := database.InitDB(*config)
+	database.Migrate(db)
 
-	userModel := model.UsersModel{}
-	userModel.Init(db)
-	barangModel := model.NewBarangModel(db)
+	userModel := data.New(db)
+	userServices := service.New(userModel, *helper.NewGenerator())
+	// barangModel := model.NewBarangModel(db)
 
-	userControll := controller.UserController{}
-	userControll.InitUserController(userModel, *config)
+	userControll := handler.NewHandler(userServices)
 
-	barangControll := controller.NewBarangControllInterface(barangModel)
+	// barangControll := controller.NewBarangControllInterface(barangModel)
 
 	e.Pre(middleware.RemoveTrailingSlash())
 
@@ -36,7 +38,7 @@ func main() {
 		}))
 
 	routes.RouteUser(e, userControll, *config)
-	routes.RouteBarang(e, barangControll, *config)
+	// routes.RouteBarang(e, barangControll, *config)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%d", config.ServerPort)).Error())
 }
