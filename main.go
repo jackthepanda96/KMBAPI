@@ -22,7 +22,8 @@ func main() {
 	database.Migrate(db)
 
 	userModel := data.New(db)
-	userServices := service.New(userModel, *helper.NewGenerator())
+	generator := helper.NewGenerator()
+	userServices := service.New(userModel, generator)
 	// barangModel := model.NewBarangModel(db)
 
 	userControll := handler.NewHandler(userServices)

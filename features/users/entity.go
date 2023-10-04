@@ -13,8 +13,8 @@ type UserHandlerInterface interface {
 	Register() echo.HandlerFunc
 }
 type UserServiceInterface interface {
-	Register(newData User) (*User, error)
+	Register(newData User) (User, error)
 }
 type UserDataInterface interface {
-	Insert(newData User) (*User, error)
+	Insert(newData User) (User, error)
 }

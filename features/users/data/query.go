@@ -16,7 +16,7 @@ func New(g *gorm.DB) users.UserDataInterface {
 	}
 }
 
-func (ud *UserData) Insert(newData users.User) (*users.User, error) {
+func (ud *UserData) Insert(newData users.User) (users.User, error) {
 	var dbData = new(User)
 	dbData.ID = newData.ID
 	dbData.HP = newData.HP
@@ -24,8 +24,8 @@ func (ud *UserData) Insert(newData users.User) (*users.User, error) {
 	dbData.Password = newData.Password
 
 	if err := ud.gorm.Create(dbData).Error; err != nil {
-		return nil, err
+		return users.User{}, err
 	}
 
-	return &newData, nil
+	return newData, nil
 }
