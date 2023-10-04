@@ -9,25 +9,53 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-func GenerateJWT(signKey string, refreshKey string, userID string) map[string]any {
+type JWTInterface interface {
+	GenerateJWT(userID string) map[string]any
+	GenerateToken(id string) string
+	ExtractToken(token *jwt.Token) any
+}
+
+type JWT struct {
+	signKey    string
+	refreshKey string
+}
+
+func New(signKey string, refreshKey string) JWTInterface {
+	return &JWT{
+		signKey:    signKey,
+		refreshKey: refreshKey,
+	}
+}
+
+func (j *JWT) GenerateJWT(userID string) map[string]any {
 	var result = map[string]any{}
-	var accessToken = generateToken(signKey, userID)
+	var accessToken = j.GenerateToken(userID)
 	if accessToken == "" {
 		return nil
 	}
-	var refresToken = generateRefreshToken(refreshKey, accessToken)
-	if refresToken == "" {
-		return nil
-	}
 	result["access_token"] = accessToken
-	result["refresh_token"] = refresToken
 	return result
 }
 
-func RefereshJWT(accessToken string, refreshToken *jwt.Token, signKey string) map[string]any {
+func (j *JWT) GenerateToken(id string) string {
+	var claims = jwt.MapClaims{}
+	claims["id"] = id
+	claims["iat"] = time.Now().Unix()
+	claims["exp"] = time.Now().Add(time.Minute * 10).Unix()
+
+	var sign = jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	validToken, err := sign.SignedString([]byte(j.signKey))
+
+	if err != nil {
+		return ""
+	}
+
+	return validToken
+}
+
+func (j JWT) RefereshJWT(accessToken string, refreshToken *jwt.Token) map[string]any {
 	var result = map[string]any{}
 	expTime, err := refreshToken.Claims.GetExpirationTime()
-	logrus.Info(expTime)
 	if err != nil {
 		logrus.Error("get token expiration error", err.Error())
 		return nil
@@ -36,7 +64,7 @@ func RefereshJWT(accessToken string, refreshToken *jwt.Token, signKey string) ma
 		var newClaim = jwt.MapClaims{}
 
 		newToken, err := jwt.ParseWithClaims(accessToken, newClaim, func(t *jwt.Token) (interface{}, error) {
-			return []byte(signKey), nil
+			return []byte(j.signKey), nil
 		})
 
 		if err != nil {
@@ -62,28 +90,12 @@ func RefereshJWT(accessToken string, refreshToken *jwt.Token, signKey string) ma
 	return nil
 }
 
-func generateToken(signKey string, id string) string {
-	var claims = jwt.MapClaims{}
-	claims["id"] = id
-	claims["iat"] = time.Now().Unix()
-	claims["exp"] = time.Now().Add(time.Minute * 10).Unix()
-
-	var sign = jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	validToken, err := sign.SignedString([]byte(signKey))
-
-	if err != nil {
-		return ""
-	}
-
-	return validToken
-}
-
-func generateRefreshToken(signKey string, accessToken string) string {
+func (j *JWT) generateRefreshToken(accessToken string) string {
 	var claims = jwt.MapClaims{}
 	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
 	var sign = jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	refreshToken, err := sign.SignedString([]byte(signKey))
+	refreshToken, err := sign.SignedString([]byte(j.refreshKey))
 
 	if err != nil {
 		return ""
@@ -92,7 +104,7 @@ func generateRefreshToken(signKey string, accessToken string) string {
 	return refreshToken
 }
 
-func ExtractToken(token *jwt.Token) any {
+func (j JWT) ExtractToken(token *jwt.Token) any {
 	if token.Valid {
 		var claims = token.Claims
 		expTime, _ := claims.GetExpirationTime()

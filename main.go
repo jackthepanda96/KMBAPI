@@ -23,7 +23,8 @@ func main() {
 
 	userModel := data.New(db)
 	generator := helper.NewGenerator()
-	userServices := service.New(userModel, generator)
+	jwtInterface := helper.New(config.Secret, config.RefreshSecret)
+	userServices := service.New(userModel, generator, jwtInterface)
 	// barangModel := model.NewBarangModel(db)
 
 	userControll := handler.NewHandler(userServices)

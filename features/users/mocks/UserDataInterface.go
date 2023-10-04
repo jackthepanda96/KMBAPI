@@ -14,22 +14,50 @@ type UserDataInterface struct {
 }
 
 // Insert provides a mock function with given fields: newData
-func (_m *UserDataInterface) Insert(newData users.User) (users.User, error) {
+func (_m *UserDataInterface) Insert(newData users.User) (*users.User, error) {
 	ret := _m.Called(newData)
 
-	var r0 users.User
+	var r0 *users.User
 	var r1 error
-	if rf, ok := ret.Get(0).(func(users.User) (users.User, error)); ok {
+	if rf, ok := ret.Get(0).(func(users.User) (*users.User, error)); ok {
 		return rf(newData)
 	}
-	if rf, ok := ret.Get(0).(func(users.User) users.User); ok {
+	if rf, ok := ret.Get(0).(func(users.User) *users.User); ok {
 		r0 = rf(newData)
 	} else {
-		r0 = ret.Get(0).(users.User)
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*users.User)
+		}
 	}
 
 	if rf, ok := ret.Get(1).(func(users.User) error); ok {
 		r1 = rf(newData)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Login provides a mock function with given fields: hp, password
+func (_m *UserDataInterface) Login(hp string, password string) (*users.User, error) {
+	ret := _m.Called(hp, password)
+
+	var r0 *users.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(string, string) (*users.User, error)); ok {
+		return rf(hp, password)
+	}
+	if rf, ok := ret.Get(0).(func(string, string) *users.User); ok {
+		r0 = rf(hp, password)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*users.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(string, string) error); ok {
+		r1 = rf(hp, password)
 	} else {
 		r1 = ret.Error(1)
 	}
