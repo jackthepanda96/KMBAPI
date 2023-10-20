@@ -4,8 +4,6 @@ COPY . /app
 
 WORKDIR /app
 
-RUN echo ${{ secrets.GOOCREDS }} >> credentials.json
-
 RUN go mod tidy
 
 RUN go build -o app .

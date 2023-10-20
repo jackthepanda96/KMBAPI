@@ -1,6 +1,8 @@
 package configs
 
 import (
+	"encoding/json"
+	"io"
 	"os"
 	"strconv"
 
@@ -80,6 +82,26 @@ func loadConfig() *ProgramConfig {
 
 	if val, found := os.LookupEnv("REFSECRET"); found {
 		res.RefreshSecret = val
+	}
+
+	if val, found := os.LookupEnv("GOOCREDS"); found {
+		jsonBytes, err := json.Marshal(val)
+		if err != nil {
+			panic(err)
+		}
+
+		// Open the JSON file for writing.
+		file, err := os.Create("credentials.json")
+		if err != nil {
+			panic(err)
+		}
+		defer file.Close()
+
+		// Write the JSON data to the file.
+		_, err = io.WriteString(file, string(jsonBytes))
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	return res
