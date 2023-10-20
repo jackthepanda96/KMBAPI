@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"restEcho1/configs"
 	"restEcho1/features/users/data"
 	"restEcho1/features/users/handler"
@@ -15,6 +16,12 @@ import (
 )
 
 func main() {
+	_, err := os.Open("credentials.json")
+	if err != nil {
+		panic(err)
+	}
+	// defer file.Close()
+
 	e := echo.New()
 	var config = configs.InitConfig()
 
